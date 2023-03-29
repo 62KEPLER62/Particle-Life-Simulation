@@ -1,0 +1,177 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            background-color: black;;
+        }
+
+        #canvas {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            left: 50%;
+            top: 50%;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        let particles = [];
+        let count = 0;
+        let n = 3;
+
+
+
+        // rules[0][0] = Math.random()-1;
+        // rules[0][1] = Math.random()-1;
+        // rules[0][2] = Math.random()-1;
+        // rules[1][0] = Math.random()-1;
+        // rules[1][1] = Math.random()-1;
+        // rules[1][2] = Math.random()-1;
+        // rules[2][0] = Math.random()-1;
+        // rules[2][1] = Math.random()-1;
+        // rules[2][2] = Math.random()-1;
+
+
+
+
+
+        class Particle {
+            constructor(x, y, colorid) {
+                this.colorid = colorid;
+                this.color;
+                switch (this.colorid) {
+                    case 0:
+                        this.color = "red";
+                        break;
+                    case 1:
+                        this.color = "blue";
+                        break;
+                    case 2:
+                        this.color = "green";
+                    break;
+                    case 3:
+                        this.color = "orange";
+                        break;
+                    case 4:
+                        this.color = "purple";
+                        break;
+                    case 5:
+                        this.color = "yellow";
+                    break;
+                    case 6:
+                        this.color = "white";
+                        break;
+                    case 7:
+                        this.color = "brown";
+                    break;
+                }
+                this.x = x;
+                this.y = y;
+                this.vx = 0;
+                this.vy = 0;
+                this.id = count++;
+            }
+
+            applyPhysics() {
+                let fx = 0;
+                let fy = 0;
+                for (let particle of particles) {
+                    if (particle.id != this.id) {
+                        let dx = this.x - particle.x;
+                        let dy = this.y - particle.y;
+                        let d = Math.sqrt(dx * dx + dy * dy);
+                        if (d > 0 && d < 200) {
+                            if (d < 1) {
+                                d = 1;
+                            }
+                            let g = rules[particle.colorid][this.colorid];
+
+                            let f = g * 1 / d;
+                            fx += (f * dx);
+                            fy += (f * dy);
+                        }
+                        this.vx = (this.vx + fx) * 0.5;
+                        this.vy = (this.vy + fy) * 0.5;
+                        this.x += this.vx*0.0005;
+                        this.y += this.vy*0.0005;
+                        if (this.x <= 0) {
+                            this.x = 5;
+                        }
+                        if (this.x >= canvas.width) {
+                            this.x = canvas.width - 5;
+                        }
+                        if (this.y <= 0) {
+                            this.y = 5;
+                        }
+                        if (this.y >= canvas.height) {
+                            this.y = canvas.height - 5;
+                        }
+
+
+                    }
+                }
+            }
+
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 2, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+        }
+
+
+        function create(number, colorid) {
+            for (let i = 0; i < number; i++) {
+                let x = Math.random() * canvas.width;
+                let y = Math.random() * canvas.height;
+                particles.push(new Particle(x, y, colorid));
+            }
+        }
+        function animate() {
+                sayac = 0;
+                canvas.width = canvas.width;
+            for (let particle of particles) {
+                particle.applyPhysics();
+            }
+            for (let particle of particles) {
+                particle.draw();
+            }
+            requestAnimationFrame(animate);
+        }
+        // create(300, 0);
+        // create(300, 1);
+        // create(300, 2);
+        n = parseInt(Math.random()*4)+3;
+
+        let rules = new Array(n);
+        for (let i = 0; i < n; i++) {
+            rules[i] = new Array(n);
+        }
+
+        for(let i=0;i<n;i++){
+            create(parseInt(Math.random()*400),i);
+        }
+        for(let i=0;i<n;i++){
+            for(let j=0;j<n;j++){
+                rules[i][j] = Math.random()*15-10;
+            }
+        }
+        animate();
+    </script>
+</body>
+
+</html>
